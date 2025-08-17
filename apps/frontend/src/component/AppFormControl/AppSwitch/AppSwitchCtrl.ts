@@ -1,5 +1,5 @@
 import { state } from "../../../lib/SpoonKit/signals/State";
-import { AppFormControl } from "../AppFormControl";
+import { AppFormControl } from "../AppFormControlOld";
 
 export class AppSwitchCtrl extends AppFormControl<boolean> {
   color = state<

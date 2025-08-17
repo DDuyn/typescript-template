@@ -1,6 +1,6 @@
+import { useCtrl } from "@lib/SpoonKitReact/useCtrl";
 import { InputAdornment, InputLabel, TextField } from "@mui/material";
-import { useCtrl } from "../../../lib/SpoonKitReact/useCtrl";
-import { AppInputCtrl } from "./AppInputCtrl";
+import type { AppInputCtrl } from "./AppInputCtrl";
 
 export function AppInput({ ctrl }: { ctrl: AppInputCtrl }) {
   const { state, setState } = useCtrl(ctrl);

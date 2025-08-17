@@ -6,7 +6,7 @@ import { state } from "../../lib/SpoonKit/signals/State";
 
 export class AppFormControl<T> extends Ctrl {
   fullWidth = state<boolean>(true);
-  value = state<T>();
+  value = state<T | null>();
   label = state<string>();
   helperText = state<string>();
   isValid = state<boolean>(true);
@@ -14,7 +14,7 @@ export class AppFormControl<T> extends Ctrl {
   fetching = state<boolean>();
   disabled = state<boolean>();
   isTouched = state<boolean>(true);
-  onChange = emitter<T>();
+  onChange = emitter<T | null>();
 
   public discard() {
     this.value.set(null);
@@ -24,7 +24,7 @@ export class AppFormControl<T> extends Ctrl {
   constructor() {
     super();
 
-    let dispose;
+    let dispose: any;
     this.onStart.subscribe(() => {
       let skipFirst = true;
       dispose = monitor(() => {

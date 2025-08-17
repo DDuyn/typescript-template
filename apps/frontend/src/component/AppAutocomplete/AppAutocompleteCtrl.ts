@@ -1,6 +1,6 @@
 import { Ctrl } from "../../lib/SpoonKit/controller/Ctrl";
 import { state } from "../../lib/SpoonKit/signals/State";
-import { AppFormControl } from "../AppFormControl/AppFormControl";
+import { AppFormControl } from "../AppFormControl/AppFormControlOld";
 
 export class AppAutocompleteCtrl<T> extends AppFormControl<T | T[]> {
   options = state<T[]>([]);

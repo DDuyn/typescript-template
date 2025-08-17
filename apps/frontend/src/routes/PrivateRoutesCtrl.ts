@@ -1,12 +1,11 @@
 import { Ctrl } from "@lib/SpoonKit/controller/Ctrl";
-import { provide } from "@lib/SpoonKit/providers";
 import { state } from "@lib/SpoonKit/signals/State";
-import { AuthService } from "@services/AuthService";
 
 export class PrivateRoutesCtrl extends Ctrl {
-  private authService = provide(AuthService);
+  authInProgress = state<boolean>(false);
 
-  authInProgress = state<boolean>(true);
+  /*private authService = provide(AuthService);
+
 
   async ctrlStart() {
     this.authInProgress.set(true);
@@ -16,5 +15,5 @@ export class PrivateRoutesCtrl extends Ctrl {
     }
 
     this.authInProgress.set(false);
-  }
+  }*/
 }

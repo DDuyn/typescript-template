@@ -1,6 +1,6 @@
 import { monitor } from "../../../lib/SpoonKit/signals/Monitor";
 import { state } from "../../../lib/SpoonKit/signals/State";
-import { AppFormControl } from "../AppFormControl";
+import { AppFormControl } from "../AppFormControlOld";
 
 export class AppTextAreaCtrl extends AppFormControl<string> {
   type = state<string>("text");

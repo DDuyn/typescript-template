@@ -15,14 +15,14 @@ export interface FieldOptions {
   mode: "commit" | "remote" | "local";
 }
 
-export class Field<T> extends State<T> {
+export class Field<T> extends State<T | null> {
   // INTERNAL STATE
-  private value = state<T>(null);
+  private value = state<T | null>(null);
   private conf: FieldConf<T>;
 
   // PUBLIC STATE
   public errors = state<string[]>([]);
-  public isValid = calc(() => this.errors?.get()?.length === 0);
+  public isValid = calc(() => this.errors.get()?.length === 0);
 
   constructor(conf: FieldConf<T> = {}) {
     super();
@@ -60,5 +60,11 @@ export class Field<T> extends State<T> {
 
   public discard() {
     this.errors.set([]);
+  }
+
+  public firstError(): string {
+    const errors = this.errors.get();
+    if (!errors || errors.length === 0) return "";
+    return errors[0];
   }
 }
