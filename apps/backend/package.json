@@ -15,8 +15,7 @@
     "gen:feature": "tsx scripts/generate-feature.ts",
     "gen:usecase": "tsx scripts/generate-usecase.ts",
     "test": "vitest",
-    "coverage": "vitest run --coverage",
-    "prepare": "husky"
+    "coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",
