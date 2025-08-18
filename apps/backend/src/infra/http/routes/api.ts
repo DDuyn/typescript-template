@@ -1,8 +1,8 @@
-import { authRouter } from "@domain/auth/auth.router";
+import { authComposition } from "@features/auth/infra/auth.composition";
 import { Hono } from "hono";
 
 const api = new Hono();
 
-api.route("/auth", authRouter);
+api.route("/auth", authComposition());
 
 export { api };

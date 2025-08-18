@@ -6,12 +6,3 @@ export const loginRequestSchema = z.object({
 });
 
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
-
-export type LoginDto = {
-  accessToken: string;
-  refreshToken: string;
-  expires_in: number | null;
-  userId: string;
-  email: string;
-  isAdmin: boolean;
-};

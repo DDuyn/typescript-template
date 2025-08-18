@@ -1,40 +1,13 @@
-import { supabaseService } from "@core/db/supabase";
+import { Result } from "@core/result/result";
+import { AuthVerifier } from "./auth-verifier";
+import { AuthUser } from "./types";
 
-export const supabaseAuth = {
-  async logout(refreshToken: string): Promise<boolean> {
-    const res = await fetch(`${process.env.SUPABASE_URL}/auth/v1/logout`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${refreshToken}`,
-        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      },
-    });
+export class AuthService {
+  constructor(private readonly authVerifier: AuthVerifier) {}
 
-    if (!res.ok) {
-      return false;
-    }
-
-    return true;
-  },
-
-  async isAdmin(userId: string): Promise<boolean> {
-    const { data, error } = await supabaseService
-      .from("profiles")
-      .select("is_admin")
-      .eq("user_id", userId)
-      .single();
-
-    if (error || !data) return false;
-    return data.is_admin;
-  },
-
-  async signOut(): Promise<boolean> {
-    const { error } = await supabaseService.auth.signOut();
-
-    if (error) {
-      return false;
-    }
-
-    return true;
-  },
-};
+  async verifyToken(
+    authorizationHeader: string | null
+  ): Promise<Result<AuthUser, string>> {
+    return this.authVerifier.verify(authorizationHeader);
+  }
+}

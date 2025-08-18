@@ -19,6 +19,9 @@ push-prod:
 migrate: generate migrate-dev
 
 create-feature:
-	cd $(BACKEND) && pnpm gen:feature $(domain) $(feature)
+	cd $(BACKEND) && pnpm gen:feature $(feature)
+
+create-usecase:
+	cd $(BACKEND) && pnpm gen:usecase $(feature) $(usecase)
 
 .PHONY: generate migrate-dev migrate-prod push-dev push-prod migrate

@@ -1,5 +1,5 @@
-import { supabaseService } from "@core/db/supabase";
 import { err, ok, Result } from "@core/result/result";
+import { supabaseService } from "infra/db/supabase";
 
 export const recoverPasswordService = async (
   email: string

@@ -6,7 +6,9 @@
     "paths": {
       "@core/*": ["core/*"],
       "@db/*": ["db/*"],
-      "@domain/*": ["domain/*"]
+      "@domain/*": ["domain/*"],
+      "@infra/*": ["infra/*"],
+      "@features/*": ["features/*"]
     }
   },
   "include": ["src"]

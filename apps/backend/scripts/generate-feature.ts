@@ -1,34 +1,30 @@
 import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const [domain, feature] = process.argv.slice(2);
+const [feature] = process.argv.slice(2);
 
-if (!domain || !feature) {
-  console.error("❌ Usage: pnpm gen:feature <domain> <feature>");
+if (!feature) {
+  console.error("❌ Usage: pnpm gen:feature <featureName>");
   process.exit(1);
 }
 
-const basePath = join(
-  __dirname,
-  "../../../apps/backend/src/domain",
-  domain,
-  "features",
-  feature
-);
+const basePath = join(__dirname, "../../../apps/backend/src/features", feature);
+const subfolders = ["domain", "api", "infra"];
 
-mkdirSync(basePath, { recursive: true });
-
-const files = [
-  `${feature}.model.ts`,
-  `${feature}.service.ts`,
-  `${feature}.handler.ts`,
-];
-
-files.forEach((file) => {
-  const path = join(basePath, file);
-  writeFileSync(path, `// ${file} for ${domain}/${feature}\n`, { flag: "wx" });
+subfolders.forEach((sub) => {
+  const subPath = join(basePath, sub);
+  mkdirSync(subPath, { recursive: true });
+  const gitkeepPath = join(subPath, ".gitkeep");
+  writeFileSync(gitkeepPath, "", { flag: "w" });
 });
 
+const compositionPath = join(basePath, "infra", `${feature}.composition.ts`);
+writeFileSync(
+  compositionPath,
+  `// Composition root for the ${feature} feature\n`,
+  { flag: "w" }
+);
+
 console.log(
-  `✅ Created ${domain}/${feature} with model, service, and handler.`
+  `✅ Created feature '${feature}' with domain, api, infra subfolders and composition.ts.`
 );

@@ -1,5 +1,5 @@
-import { supabaseService } from "@core/db/supabase";
 import { Result, err, ok } from "@core/result/result";
+import { supabaseService } from "infra/db/supabase";
 
 export const signupService = async (
   email: string,

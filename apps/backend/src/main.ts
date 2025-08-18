@@ -1,7 +1,7 @@
 import { env } from "@core/env/env";
 import { serve } from "@hono/node-server";
+import { api } from "@infra/http/routes/api";
 import { Hono } from "hono";
-import { api } from "infra/http/routes/api";
 
 const app = new Hono();
 

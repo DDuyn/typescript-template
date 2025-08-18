@@ -1,10 +1,14 @@
-import { supabaseService } from "@core/db/supabase";
+import { AuthService } from "@core/auth/auth.service";
 import { isErr, isOk } from "@core/result/result";
 import { cookieOptions } from "@core/types/cookie";
+import { SupabaseAuthVerifier } from "features/auth/infra/services/supabase-auth-verifier";
+import { SupabaseAuthService } from "features/auth/infra/services/supabase.service";
 import { MiddlewareHandler } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
-import { supabaseAuth } from "./auth.service";
-import { verifySupabaseJWT } from "./verify-jwt";
+import { supabaseService } from "infra/db/supabase";
+
+const authService = new AuthService(new SupabaseAuthVerifier());
+const supabaseAuth = new SupabaseAuthService();
 
 export const requireAuth: MiddlewareHandler = async (c, next) => {
   let accessToken = getCookie(c, "access_token");
@@ -17,7 +21,7 @@ export const requireAuth: MiddlewareHandler = async (c, next) => {
     );
   }
 
-  let result = await verifySupabaseJWT(accessToken);
+  let result = await authService.verifyToken(accessToken);
 
   if (isErr(result)) {
     const { data, error } = await supabaseService.auth.refreshSession({
@@ -38,7 +42,7 @@ export const requireAuth: MiddlewareHandler = async (c, next) => {
     accessToken = data.session.access_token;
     setCookie(c, "access_token", accessToken, cookieOptions);
 
-    result = await verifySupabaseJWT(accessToken);
+    result = await authService.verifyToken(accessToken);
   }
 
   if (isOk(result)) {

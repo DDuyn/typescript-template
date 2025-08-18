@@ -1,12 +1,13 @@
-import { supabaseAuth } from "@core/auth/auth.service";
 import { err, ok, Result } from "@core/result/result";
+import { AuthContext } from "../auth.context";
 
 export const logoutService = async (
-  refreshToken: string
+  refreshToken: string,
+  authContext: AuthContext
 ): Promise<Result<true, string>> => {
-  const res = await supabaseAuth.logout(refreshToken);
+  const result = await authContext.repository.logout(refreshToken);
 
-  if (!res) {
+  if (!result) {
     return err("Failed to logout");
   }
 
