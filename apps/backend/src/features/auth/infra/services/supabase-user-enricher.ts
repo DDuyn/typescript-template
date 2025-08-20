@@ -1,9 +1,5 @@
-import { AuthUser } from "@core/auth/types";
+import { AuthUser, UserEnricher } from "@core/auth/types";
 import { SupabaseAuthService } from "./supabase.service";
-
-export interface UserEnricher {
-  enrich(user: AuthUser): Promise<AuthUser & { isAdmin: boolean }>;
-}
 
 export class SupabaseUserEnricher implements UserEnricher {
   constructor(private supabaseAuth: SupabaseAuthService) {}

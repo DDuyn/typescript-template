@@ -1,19 +1,47 @@
 export type Factory<T> = () => T;
 export type AsyncFactory<T> = () => Promise<T>;
+export type DependentFactory<T> = (container: Container) => T;
+export type AsyncDependentFactory<T> = (container: Container) => Promise<T>;
+
+export type AnyFactory<T> =
+  | Factory<T>
+  | AsyncFactory<T>
+  | DependentFactory<T>
+  | AsyncDependentFactory<T>;
 
 export class Container {
   private singletons = new Map<string, any>();
-  private factories = new Map<string, Factory<any> | AsyncFactory<any>>();
+  private factories = new Map<string, AnyFactory<any>>();
+  private isBuilding = new Set<string>();
 
-  register<T>(key: string, factory: Factory<T> | AsyncFactory<T>) {
+  register<T>(key: string, factory: AnyFactory<T>) {
     this.factories.set(key, factory);
   }
 
-  singleton<T>(key: string, factory: Factory<T> | AsyncFactory<T>) {
-    this.register(key, () => {
+  singleton<T>(key: string, factory: AnyFactory<T>) {
+    this.register(key, (container?: Container) => {
       if (!this.singletons.has(key)) {
-        const instance = factory();
-        this.singletons.set(key, instance);
+        if (this.isBuilding.has(key)) {
+          throw new Error(`Circular dependency detected: ${key}`);
+        }
+
+        this.isBuilding.add(key);
+
+        try {
+          let instance: T | Promise<T>;
+
+          if (factory.length > 0) {
+            instance = (
+              factory as DependentFactory<T> | AsyncDependentFactory<T>
+            )(this);
+          } else {
+            instance = (factory as Factory<T> | AsyncFactory<T>)();
+          }
+
+          this.singletons.set(key, instance);
+        } finally {
+          this.isBuilding.delete(key);
+        }
       }
       return this.singletons.get(key);
     });
@@ -29,7 +57,16 @@ export class Container {
       throw new Error(`No factory registered for key: ${key}`);
     }
 
-    const result = factory();
+    let result: T | Promise<T>;
+
+    if (factory.length > 0) {
+      result = (factory as DependentFactory<T> | AsyncDependentFactory<T>)(
+        this
+      );
+    } else {
+      result = (factory as Factory<T> | AsyncFactory<T>)();
+    }
+
     return result instanceof Promise ? await result : result;
   }
 
@@ -39,10 +76,26 @@ export class Container {
       throw new Error(`No factory registered for key: ${key}`);
     }
 
-    const result = factory();
+    let result: T;
+
+    if (factory.length > 0) {
+      result = (factory as DependentFactory<T>)(this);
+    } else {
+      result = (factory as Factory<T>)();
+    }
+
     if (result instanceof Promise) {
       throw new Error(`Cannot resolve async factory synchronously: ${key}`);
     }
+
     return result;
+  }
+
+  has(key: string): boolean {
+    return this.factories.has(key);
+  }
+
+  getKeys(): string[] {
+    return Array.from(this.factories.keys());
   }
 }
