@@ -5,13 +5,13 @@ import { Context } from "hono";
 import { deleteCookie, getCookie } from "hono/cookie";
 
 export const logoutHandler = async (c: Context, authContext: AuthContext) => {
-  const refreshToken = getCookie(c, "refresh_token");
+  const accessToken = getCookie(c, "access_token");
 
-  if (!refreshToken) {
-    return c.json({ ok: false, error: "No refresh token found." }, 400);
+  if (!accessToken) {
+    return c.json({ ok: false, error: "No access token found." }, 400);
   }
 
-  const result = await logoutService(refreshToken, authContext);
+  const result = await logoutService(accessToken, authContext);
   deleteCookie(c, "refresh_token", { path: "/api" });
   deleteCookie(c, "access_token", { path: "/api" });
 

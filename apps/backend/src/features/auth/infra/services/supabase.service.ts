@@ -22,12 +22,12 @@ export class SupabaseAuthService {
     return true;
   }
 
-  async logout(refreshToken: string): Promise<boolean> {
+  async logout(accessToken: string): Promise<boolean> {
     const res = await fetch(`${process.env.SUPABASE_URL}/auth/v1/logout`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${refreshToken}`,
-        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        Authorization: `Bearer ${accessToken}`,
+        apikey: process.env.SUPABASE_ANON_KEY!,
       },
     });
 

@@ -1,5 +1,4 @@
-import { AuthRepository } from "features/auth/infra/repositories/auth.repository";
+import { FeatureContext } from "@core/types/feature-context";
+import { AuthRepository } from "../infra/repositories/auth.repository";
 
-export type AuthContext = {
-  repository: AuthRepository;
-};
+export type AuthContext = FeatureContext<AuthRepository>;

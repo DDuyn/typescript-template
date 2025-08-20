@@ -26,7 +26,7 @@ export class AuthRepository {
     return row.isAdmin;
   }
 
-  async logout(refreshToken: string): Promise<boolean> {
-    return this.supabaseAuth.logout(refreshToken);
+  async logout(accessToken: string): Promise<boolean> {
+    return this.supabaseAuth.logout(accessToken);
   }
 }
