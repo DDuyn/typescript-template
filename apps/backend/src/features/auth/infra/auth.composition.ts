@@ -1,49 +1,29 @@
-import { CompositionBuilder } from "@core/di/composition-builder";
-import { RouteBuilder } from "@infra/http/routes/route-builder";
-import { Hono } from "hono";
-import { AuthContext } from "../domain/auth.context";
-import { authRoutes } from "./auth.routes";
+import { TokenManager } from "@core/auth/token-manager";
 import { AuthRepository } from "./repositories/auth.repository";
+import { SupabaseAuthVerifier } from "./services/supabase-auth-verifier";
+import { SupabaseTokenRefresher } from "./services/supabase-token-refresher";
+import { SupabaseUserEnricher } from "./services/supabase-user-enricher";
 import { SupabaseAuthService } from "./services/supabase.service";
+import { AuthContext } from "../domain/auth.context";
 
-export const AUTH_COMPOSITION_KEYS = {
-  SUPABASE_AUTH_SERVICE: "supabaseAuthService",
-  AUTH_REPOSITORY: "authRepository",
-  AUTH_CONTEXT: "authContext",
-  AUTH_ROUTER: "authRouter",
-} as const;
+export function createAuthDependencies() {
+  const supabaseAuthService = new SupabaseAuthService();
+  const authRepository = new AuthRepository(supabaseAuthService);
+  const authVerifier = new SupabaseAuthVerifier();
+  const tokenRefresher = new SupabaseTokenRefresher();
+  const tokenManager = new TokenManager(authVerifier, tokenRefresher);
+  const userEnricher = new SupabaseUserEnricher(supabaseAuthService);
 
-export function buildAuthComposition() {
-  return new CompositionBuilder()
-    .registerSingleton(
-      AUTH_COMPOSITION_KEYS.SUPABASE_AUTH_SERVICE,
-      () => new SupabaseAuthService()
-    )
-
-    .registerSingletonWithDeps(
-      AUTH_COMPOSITION_KEYS.AUTH_REPOSITORY,
-      [AUTH_COMPOSITION_KEYS.SUPABASE_AUTH_SERVICE],
-      (supabaseService: SupabaseAuthService) =>
-        new AuthRepository(supabaseService)
-    )
-
-    .registerSingletonWithDeps(
-      AUTH_COMPOSITION_KEYS.AUTH_CONTEXT,
-      [AUTH_COMPOSITION_KEYS.AUTH_REPOSITORY],
-      (repository: AuthRepository): AuthContext => ({ repository })
-    )
-
-    .registerSingletonWithDeps(
-      AUTH_COMPOSITION_KEYS.AUTH_ROUTER,
-      [AUTH_COMPOSITION_KEYS.AUTH_CONTEXT],
-      (context: AuthContext): Hono =>
-        RouteBuilder.buildRoutes(authRoutes, context)
-    )
-
-    .build();
+  return {
+    authRepository,
+    authVerifier,
+    tokenManager,
+    userEnricher,
+    supabaseAuthService,
+  };
 }
 
-export async function createAuthRouter(): Promise<Hono> {
-  const composition = buildAuthComposition();
-  return await composition.resolve<Hono>(AUTH_COMPOSITION_KEYS.AUTH_ROUTER);
+export function createAuthContext(): AuthContext {
+  const { authRepository } = createAuthDependencies();
+  return { repository: authRepository };
 }

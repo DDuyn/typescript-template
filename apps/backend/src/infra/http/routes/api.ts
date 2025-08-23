@@ -1,9 +1,8 @@
+import { createAuthRouter } from "@features/auth/infra/auth.routes";
 import { Hono } from "hono";
 
 const api = new Hono();
 
-const authRouter = await createAuthRouter();
-
-api.route("/auth", authRouter);
+api.route("/auth", createAuthRouter());
 
 export { api };
