@@ -1,15 +1,18 @@
-import { supabaseService } from "infra/db/supabase";
+import { db } from "@infra/db/drizzle";
+import { profiles } from "@infra/db/schema/profile.schema";
+import { supabaseService } from "@infra/db/supabase";
+import { eq } from "drizzle-orm";
 
 export class SupabaseAuthService {
   async isAdmin(userId: string): Promise<boolean> {
-    const { data, error } = await supabaseService
-      .from("profiles")
-      .select("is_admin")
-      .eq("user_id", userId)
-      .single();
+    const [row] = await db
+      .select({ isAdmin: profiles.isAdmin })
+      .from(profiles)
+      .where(eq(profiles.userId, userId))
+      .limit(1);
 
-    if (error || !data) return false;
-    return data.is_admin;
+    if (!row) return false;
+    return row.isAdmin;
   }
 
   async signOut(): Promise<boolean> {
