@@ -1,9 +1,11 @@
 import { isErr } from "@core/result/result";
 import { Context } from "hono";
-import { signupRequestSchema } from "./signup.model";
-import { signupService } from "./signup.service";
 
-export const signupHandler = async (c: Context) => {
+import { AuthContext } from "@features/auth/domain/auth.context";
+import { signupService } from "@features/auth/domain/signup/signup.service";
+import { signupRequestSchema } from "./signup.request";
+
+export const signupHandler = async (c: Context, authContext: AuthContext) => {
   const parsedResult = signupRequestSchema.safeParse(await c.req.json());
 
   if (!parsedResult.success) {
@@ -11,7 +13,7 @@ export const signupHandler = async (c: Context) => {
   }
 
   const { email, password } = parsedResult.data;
-  const result = await signupService(email, password);
+  const result = await signupService(email, password, authContext);
 
   if (isErr(result)) {
     return c.json({ ok: false, error: result.error }, 500);

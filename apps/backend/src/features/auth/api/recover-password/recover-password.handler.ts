@@ -1,9 +1,13 @@
 import { isErr } from "@core/result/result";
+import { AuthContext } from "@features/auth/domain/auth.context";
+import { recoverPasswordService } from "@features/auth/domain/recover-password/recover-password.service";
 import { Context } from "hono";
-import { recoverPasswordRequestSchema } from "./recover-password.model";
-import { recoverPasswordService } from "./recover-password.service";
+import { recoverPasswordRequestSchema } from "./recover-password.request";
 
-export const recoverPasswordHandler = async (c: Context) => {
+export const recoverPasswordHandler = async (
+  c: Context,
+  authContext: AuthContext
+) => {
   const body = await c.req.json();
   const parsedResult = recoverPasswordRequestSchema.safeParse(body);
 
@@ -17,7 +21,10 @@ export const recoverPasswordHandler = async (c: Context) => {
     );
   }
 
-  const result = await recoverPasswordService(parsedResult.data.email);
+  const result = await recoverPasswordService(
+    parsedResult.data.email,
+    authContext
+  );
 
   if (isErr(result)) {
     return c.json({ ok: false, error: result.error }, 500);

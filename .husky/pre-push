@@ -1,5 +1,28 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-pnpm -F backend test
-#pnpm -F frontend test
+echo "🚀 Running pre-push checks…"
+
+# Encuentra los paquetes que cambiaron respecto a main
+CHANGED_PACKAGES=$(pnpm -r exec -- git diff --name-only origin/main | awk -F/ '{print $2}' | sort -u)
+
+# Si no hay cambios detectados, salir
+if [ -z "$CHANGED_PACKAGES" ]; then
+  echo "No changed packages detected. Skipping pre-push checks."
+  exit 0
+fi
+
+echo "Changed packages: $CHANGED_PACKAGES"
+
+# Para cada paquete que cambió, corre test + tsc
+for pkg in $CHANGED_PACKAGES; do
+  echo "🛠 Checking $pkg…"
+
+  # test
+  pnpm -F "$pkg" test || { echo "Tests failed in $pkg"; exit 1; }
+
+  # typescript compilation
+  pnpm -F "$pkg" tsc --noEmit || { echo "TypeScript compilation failed in $pkg"; exit 1; }
+done
+
+echo "✅ All pre-push checks passed!"

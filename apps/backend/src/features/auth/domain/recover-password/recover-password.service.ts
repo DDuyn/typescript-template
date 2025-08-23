@@ -1,10 +1,11 @@
 import { err, ok, Result } from "@core/result/result";
-import { supabaseService } from "infra/db/supabase";
+import { AuthContext } from "../auth.context";
 
 export const recoverPasswordService = async (
-  email: string
+  email: string,
+  authContext: AuthContext
 ): Promise<Result<true, string>> => {
-  const { error } = await supabaseService.auth.resetPasswordForEmail(email);
+  const { error } = await authContext.repository.recoverPassword(email);
   if (error) {
     return err(error.message);
   }
