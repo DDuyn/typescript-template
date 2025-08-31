@@ -14,10 +14,14 @@ export async function loginService(
     );
 
     if (error || !data.session || !data.user) {
+      await authContext.logger.logAuth("failed_login", undefined, email);
+      await authContext.metrics.metricAuth("failed_login", email);
       return err("Invalid credentials");
     }
 
     const isAdmin = await authContext.repository.findIsAdmin(data.user.id);
+    await authContext.logger.logAuth("login", data.user.id, email);
+    await authContext.metrics.metricAuth("login", email);
 
     return ok({
       accessToken: data.session.access_token,
@@ -28,6 +32,11 @@ export async function loginService(
       isAdmin,
     });
   } catch (error) {
+    await authContext.logger.error(
+      "Login service error",
+      { error: error instanceof Error ? error.message : error },
+      undefined
+    );
     return err(error instanceof Error ? error.message : "Unknown error");
   }
 }

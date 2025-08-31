@@ -1,5 +1,9 @@
 import { env } from "@core/env/env";
 import { serve } from "@hono/node-server";
+import {
+  monitoringMiddleware,
+  requestIdMiddleware,
+} from "@infra/http/middleware/monitoring.middleware";
 import { api } from "@infra/http/routes/api";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -8,6 +12,9 @@ import { logger } from "hono/logger";
 const app = new Hono();
 
 app.use("*", logger());
+app.use("*", monitoringMiddleware);
+app.use("*", requestIdMiddleware);
+
 app.use(
   "*",
   cors({
