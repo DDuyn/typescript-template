@@ -11,12 +11,14 @@ const mockLogger: Partial<LoggerService> = {
   debug: vi.fn(),
   warn: vi.fn(),
   error: vi.fn(),
+  logAuth: vi.fn(),
 };
 
 const mockMetrics: Partial<MetricService> = {
   increment: vi.fn(),
   gauge: vi.fn(),
   histogram: vi.fn(),
+  metricAuth: vi.fn(),
 };
 
 describe("loginService", () => {
