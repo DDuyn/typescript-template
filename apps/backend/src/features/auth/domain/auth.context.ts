@@ -1,6 +1,6 @@
 import { LoggerService } from "@features/monitoring/domain/logger/logger.service";
-import { AuthRepository } from "../infra/repositories/auth.repository";
 import { MetricService } from "@features/monitoring/domain/metric/metric.service";
+import { AuthRepository } from "../infra/repositories/auth.repository";
 
 export type AuthContext = {
   repository: AuthRepository;

@@ -1,8 +1,23 @@
 import { isErr, isOk } from "@core/result/result";
 import { AuthRepository } from "@features/auth/infra/repositories/auth.repository";
+import { LoggerService } from "@features/monitoring/domain/logger/logger.service";
+import { MetricService } from "@features/monitoring/domain/metric/metric.service";
 import { describe, expect, it, vi } from "vitest";
 import { AuthContext } from "../auth.context";
 import { loginService } from "./login.service";
+
+const mockLogger: Partial<LoggerService> = {
+  info: vi.fn(),
+  debug: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+};
+
+const mockMetrics: Partial<MetricService> = {
+  increment: vi.fn(),
+  gauge: vi.fn(),
+  histogram: vi.fn(),
+};
 
 describe("loginService", () => {
   it("happy path: valid credentials, user is admin", async () => {
@@ -20,7 +35,11 @@ describe("loginService", () => {
       }),
       findIsAdmin: vi.fn().mockResolvedValue(true),
     };
-    const ctx: AuthContext = { repository: mockRepo as AuthRepository };
+    const ctx: AuthContext = {
+      repository: mockRepo as AuthRepository,
+      logger: mockLogger as LoggerService,
+      metrics: mockMetrics as MetricService,
+    };
 
     const result = await loginService("admin@test.com", "password123", ctx);
 
@@ -37,7 +56,11 @@ describe("loginService", () => {
         .fn()
         .mockResolvedValue({ data: { user: null, session: null }, error: {} }),
     };
-    const ctx: AuthContext = { repository: mockRepo as AuthRepository };
+    const ctx: AuthContext = {
+      repository: mockRepo as AuthRepository,
+      logger: mockLogger as LoggerService,
+      metrics: mockMetrics as MetricService,
+    };
 
     const result = await loginService("bad@test.com", "wrong", ctx);
 
@@ -59,8 +82,11 @@ describe("loginService", () => {
       }),
       findIsAdmin: vi.fn().mockResolvedValue(false),
     };
-    const ctx: AuthContext = { repository: mockRepo as AuthRepository };
-
+    const ctx: AuthContext = {
+      repository: mockRepo as AuthRepository,
+      logger: mockLogger as LoggerService,
+      metrics: mockMetrics as MetricService,
+    };
     const result = await loginService("user@test.com", "password123", ctx);
 
     expect(isOk(result)).toBe(true);
@@ -73,8 +99,11 @@ describe("loginService", () => {
     const mockRepo: Partial<AuthRepository> = {
       signInWithEmail: vi.fn().mockRejectedValue(new Error("DB failure")),
     };
-    const ctx: AuthContext = { repository: mockRepo as AuthRepository };
-
+    const ctx: AuthContext = {
+      repository: mockRepo as AuthRepository,
+      logger: mockLogger as LoggerService,
+      metrics: mockMetrics as MetricService,
+    };
     const result = await loginService("any@test.com", "password123", ctx);
 
     expect(isErr(result)).toBe(true);
@@ -84,8 +113,11 @@ describe("loginService", () => {
     const mockRepo: Partial<AuthRepository> = {
       signInWithEmail: vi.fn().mockRejectedValue("some string error"),
     };
-    const ctx: AuthContext = { repository: mockRepo as AuthRepository };
-
+    const ctx: AuthContext = {
+      repository: mockRepo as AuthRepository,
+      logger: mockLogger as LoggerService,
+      metrics: mockMetrics as MetricService,
+    };
     const result = await loginService("any@test.com", "password123", ctx);
 
     expect(isErr(result)).toBe(true);
