@@ -1,8 +1,0 @@
-.MuiPickersInputBase-root {
-  border-radius: 0px !important;
-  background-color: transparent !important;
-
-  &::before {
-    border: none !important;
-  }
-}
