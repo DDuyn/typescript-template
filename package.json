@@ -4,5 +4,10 @@
   },
   "scripts": {
     "prepare": "husky"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
